@@ -27,6 +27,7 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+        window.addEventListener('load', this.fillMainContent, false);
     },
     // deviceready Event Handler
     //
@@ -45,6 +46,22 @@ var app = {
         receivedElement.setAttribute('style', 'display:block;');
 
         console.log('Received Event: ' + id);
+    },
+
+    fillMainContent: function() {
+        var source   = document.getElementById("main-content").innerHTML;
+        var template = Handlebars.compile(source);
+        var currentdate = new Date(); 
+        var time = currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+        var context = {currentTime: time};
+        var html    = template(context);
+        var contentWrapper = document.getElementById("content-wrapper");
+        contentWrapper.innerHTML = html;
+        setTimeout(function(){
+            app.fillMainContent()
+        },1000);
     }
 };
 
