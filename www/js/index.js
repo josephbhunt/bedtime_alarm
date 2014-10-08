@@ -27,7 +27,7 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
-        window.addEventListener('load', this.fillMainContent, false);
+        window.addEventListener('load', this.initCurrentTime, false);
     },
     // deviceready Event Handler
     //
@@ -36,6 +36,7 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
     },
+
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
@@ -48,21 +49,69 @@ var app = {
         console.log('Received Event: ' + id);
     },
 
-    fillMainContent: function() {
-        var source   = document.getElementById("main-content").innerHTML;
-        var template = Handlebars.compile(source);
-        var currentdate = new Date(); 
-        var time = currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
+    initCurrentTime: function() {
+        var currentDate = new Date();
+        var time = dateToTime(currentDate);
         var context = {currentTime: time};
+        app.setTemplate("current-time-template", context, "current-time");
+
+        setHour = 8;
+        setMinute = 0;
+        var wakeDate = null;
+        var secondsLeft = null;
+        if (currentDate.getHours() > setHour) {
+            wakeDate = Date.parse("tomorrow").set({hour: setHour, minute: setMinute});
+            secondsLeft = wakeDate.getTime() - currentDate.getTime();
+        }
+        else {
+            wakeDate = Date.today().set({hour: setHour, minute: setMinute});
+            secondsLeft = currentDate.getTime() - wakeDate.getTime();
+        }
+        var timeLeft = secondsToTime(secondsLeft/1000);
+        context = {timeLeft: timeLeft};
+        app.setTemplate("time-left-template", context, "time-left");
+
+        //setTimeout(function(){
+        //    app.initCurrentTime()
+        //},1000);
+    },
+
+    setTemplate: function(templateId, context, htmlId){
+        var source   = document.getElementById(templateId).innerHTML;
+        var template = Handlebars.compile(source);
         var html    = template(context);
-        var contentWrapper = document.getElementById("content-wrapper");
+        var contentWrapper = document.getElementById(htmlId);
         contentWrapper.innerHTML = html;
-        setTimeout(function(){
-            app.fillMainContent()
-        },1000);
-    }
+    },
 };
 
 app.initialize();
+
+/**
+* Convert number of seconds into time object
+*
+* @param integer secs Number of seconds to convert
+* @return object
+*/
+function secondsToTime(secs)
+{   
+    secs = Math.abs(secs);
+    var hours = Math.floor(secs / (60 * 60));
+   
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+ 
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+   
+    var obj = {
+        "hours": hours,
+        "minutes": minutes,
+        "seconds": seconds
+    };
+    return obj;
+}
+
+function dateToTime(date){
+    return {'hours': date.getHours(), 'minutes': date.getMinutes(), 'seconds': date.getSeconds()};
+}

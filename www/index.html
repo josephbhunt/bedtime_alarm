@@ -28,15 +28,30 @@
         <title>Bedtime Alarm</title>
     </head>
     <body>
-        <div id="content-wrapper"></div>
-        <script id="main-content" type="text/javascript" src="js/index.js">
+        <div id="current-time"></div>
+        <div id="time-left"></div>
+        <div id='alarm-form'>
+            <label for='wake-time'>Wake Up</label>
+            <input type='text' id="wake-time"/>
+            <label for='hours'>How many hours of sleep?</label>
+            <input type='text' id="sleep-hours"/>
+        </div>
+
+        <script id="time-left-template" type="text/javascript" src="js/index.js">
+            <div class="time-left">
+                {{timeLeft.hours}}:{{timeLeft.minutes}}:{{timeLeft.seconds}}
+            </div>
+        </script>
+
+        <script id="current-time-template" type="text/javascript" src="js/index.js">
             <div class="content">
-                {{currentTime}}
+                {{currentTime.hours}}:{{currentTime.minutes}}:{{currentTime.seconds}}
             </div>
         </script>
 
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/handlebars-v2.0.0.js"></script>
+        <script type="text/javascript" src="js/date.js"></script>
         <script id="content-template" type="text/x-handlebars-template">
         </script>
 
